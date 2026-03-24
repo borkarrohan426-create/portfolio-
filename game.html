@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game | Rohan Borkar</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #2c3e50;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 { margin-bottom: 5px; color: #ecf0f1; }
+        #score { font-size: 20px; margin-bottom: 15px; color: #f1c40f; font-weight: bold; }
+        canvas {
+            background-color: #34495e;
+            border: 2px solid #ecf0f1;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+        /* Mobile Controls Styling */
+        .controls {
+            display: grid;
+            grid-template-columns: 60px 60px 60px;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        .btn-up { grid-column: 2; }
+        .btn-left { grid-column: 1; }
+        .btn-right { grid-column: 3; }
+        .btn-down { grid-column: 2; grid-row: 2; }
+        
+        button {
+            padding: 15px;
+            font-size: 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        button:active { background-color: #2980b9; transform: scale(0.95); }
+        
+        .back-btn {
+            margin-top: 30px;
+            text-decoration: none;
+            color: #fff;
+            background-color: #e74c3c;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Snake Game 🐍</h2>
+    <div id="score">Score: 0</div>
+    
+    <canvas id="gameCanvas" width="300" height="300"></canvas>
+
+    <div class="controls">
+        <button class="btn-up" onclick="changeDirection('UP')">⬆️</button>
+        <button class="btn-left" onclick="changeDirection('LEFT')">⬅️</button>
+        <button class="btn-right" onclick="changeDirection('RIGHT')">➡️</button>
+        <button class="btn-down" onclick="changeDirection('DOWN')">⬇️</button>
+    </div>
+
+    <a href="index.html" class="back-btn">⬅️ Back to Portfolio</a>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const gridSize = 15;
+        let snake = [{x: 150, y: 150}];
+        let food = {x: 75, y: 75};
+        let dx = gridSize;
+        let dy = 0;
+        let score = 0;
+        let gameLoop;
+
+        function drawGame() {
+            // Move Snake
+            const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+            snake.unshift(head);
+
+            // Check if food eaten
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                document.getElementById('score').innerText = 'Score: ' + score;
+                generateFood();
+            } else {
+                snake.pop(); // Remove tail
+            }
+
+            // Check collision (Wall or Self)
+            if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height || checkSelfCollision(head)) {
+                clearInterval(gameLoop);
+                alert("Game Over! Your Score is: " + score + "\nRefresh to play again.");
+                return;
+            }
+
+            // Clear Screen
+            ctx.fillStyle = "#34495e";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Food
+            ctx.fillStyle = "#e74c3c";
+            ctx.fillRect(food.x, food.y, gridSize, gridSize);
+
+            // Draw Snake
+            ctx.fillStyle = "#2ecc71";
+            snake.forEach(segment => {
+                ctx.fillRect(segment.x, segment.y, gridSize, gridSize);
+                ctx.strokeStyle = "#27ae60";
+                ctx.strokeRect(segment.x, segment.y, gridSize, gridSize);
+            });
+        }
+
+        function checkSelfCollision(head) {
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) return true;
+            }
+            return false;
+        }
+
+        function generateFood() {
+            food.x = Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize;
+            food.y = Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize;
+        }
+
+        function changeDirection(dir) {
+            if (dir === 'UP' && dy === 0) { dx = 0; dy = -gridSize; }
+            if (dir === 'DOWN' && dy === 0) { dx = 0; dy = gridSize; }
+            if (dir === 'LEFT' && dx === 0) { dx = -gridSize; dy = 0; }
+            if (dir === 'RIGHT' && dx === 0) { dx = gridSize; dy = 0; }
+        }
+
+        // Start Game
+        generateFood();
+        gameLoop = setInterval(drawGame, 150);
+    </script>
+</body>
+</html>
