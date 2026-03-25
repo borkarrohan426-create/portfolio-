@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Waste Management Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f7f6; color: #333; display: flex; flex-wrap: wrap; }
+        
+        .sidebar { width: 250px; background: #2c3e50; color: white; height: 100vh; padding: 20px; }
+        .sidebar h2 { font-size: 1.5rem; margin-bottom: 20px; color: #1abc9c; border-bottom: 2px solid #1abc9c; padding-bottom: 10px;}
+        .sidebar ul { list-style: none; }
+        .sidebar ul li { padding: 12px 0; cursor: pointer; border-bottom: 1px solid #34495e; font-size: 1.1rem; transition: 0.3s; }
+        .sidebar ul li:hover { color: #1abc9c; padding-left: 5px; } /* Hover karne par thoda aage khiskega */
+        
+        .main-content { flex: 1; padding: 20px; min-width: 300px; }
+        header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; flex-wrap: wrap; gap: 10px;}
+        header h1 { font-size: 1.3rem; color: #2c3e50; }
+        
+        .cards { display: flex; gap: 20px; flex-wrap: wrap; }
+        .card { background: white; flex: 1; min-width: 220px; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; border-top: 5px solid #3498db; transition: transform 0.3s; }
+        .card:hover { transform: translateY(-5px); } /* Card par ungli rakhne se thoda upar uthega */
+        .card h3 { color: #7f8c8d; font-size: 1.1rem; margin-bottom: 10px; }
+        .card p { font-size: 2.2rem; font-weight: bold; color: #2c3e50; margin-bottom: 5px; }
+        
+        .status-safe { color: #2ecc71 !important; }    
+        .status-warning { color: #f39c12 !important; } 
+        .status-danger { color: #e74c3c !important; }  
+        
+        .graph-area { background: white; margin-top: 20px; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .graph-box { position: relative; height: 300px; width: 100%; margin-top: 15px; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; padding: 15px; }
+            .sidebar ul { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+            .sidebar ul li { border: none; background: #34495e; padding: 8px 15px; border-radius: 5px; font-size: 0.9rem;}
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Smart Admin</h2>
+        <ul>
+            <li onclick="alert('Aap abhi main Dashboard par hi hain!')">📊 Dashboard</li>
+            <li onclick="alert('Dustbin Status page ka data load ho raha hai... (Coming Soon)')">🗑️ Dustbin Status</li>
+            <li onclick="alert('Settings menu abhi development mein hai.')">⚙️ Settings</li>
+            <li onclick="window.location.href='https://borkarrohan426-create.github.io/portfolio-/'" style="background: #e74c3c; color: white; border-radius: 5px; text-align: center; margin-top: 10px; border: none;">⬅️ Back Home</li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>Smart Waste Management</h1>
+            <span style="font-weight: bold; color: #3498db;">Admin: Rohan</span>
+        </header>
+
+        <div class="cards">
+            <div class="card" style="border-top-color: #2ecc71;">
+                <h3>Zone A - Main Gate</h3>
+                <p class="status-safe">25%</p>
+                <small>Status: Normal / Safe</small>
+            </div>
+            
+            <div class="card" style="border-top-color: #f39c12;">
+                <h3>Zone B - Cafeteria</h3>
+                <p class="status-warning">75%</p>
+                <small>Status: Nearing Capacity</small>
+            </div>
+            
+            <div class="card" style="border-top-color: #e74c3c;">
+                <h3>Zone C - Back Hostel</h3>
+                <p class="status-danger">98%</p>
+                <small>Status: Pickup Needed!</small>
+            </div>
+        </div>
+
+        <div class="graph-area">
+            <h2 style="color: #2c3e50; font-size: 1.2rem;">Live Fill Level Monitor</h2>
+            <div class="graph-box">
+                <canvas id="wasteChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('wasteChart');
+
+        new Chart(ctx, {
+            type: 'bar', 
+            data: {
+                labels: ['Zone A (Main Gate)', 'Zone B (Cafeteria)', 'Zone C (Back Hostel)'],
+                datasets: [{
+                    label: 'Dustbin Fill Level (%)',
+                    data: [25, 75, 98], 
+                    backgroundColor: [
+                        'rgba(46, 204, 113, 0.8)', 
+                        'rgba(243, 156, 18, 0.8)', 
+                        'rgba(231, 76, 60, 0.8)'   
+                    ],
+                    borderColor: [
+                        'rgba(46, 204, 113, 1)',
+                        'rgba(243, 156, 18, 1)',
+                        'rgba(231, 76, 60, 1)'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 5 
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100 
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
